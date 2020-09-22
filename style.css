@@ -1,0 +1,157 @@
+body {
+    background: #8ea4bf;
+    font-family: 'Montserrat';
+}
+
+.sidebar {
+    height: 100%;
+    width: 150px;
+    position: fixed;
+    z-index: 1;
+    top: 0; /* Stay at the top */
+    left: 0;
+
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 20px;
+    background: #d7dce3;
+}
+
+.side-link {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+main {
+    margin-left: 150px;
+}
+
+hr {
+    color: black;
+    opacity: 0.7;
+    margin: 0 10px 0 10px;
+}
+
+.project-names:hover > .material-icons {
+    display: inline;
+}
+
+.project-names {
+    word-wrap: break-word;
+    white-space: normal;
+    margin: 0 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-left: 30px;
+}
+
+#view {
+    position: relative;
+}
+
+#view .material-icons {
+    font-size: 20px;
+    position: relative;
+    top: 5px;
+}
+
+.project-names .material-icons {
+    z-index: 1;
+    display: none;
+    font-size: medium;
+    margin-left: 20px;
+}
+
+input,
+.new {
+    display: inline-block;
+    margin: 20px 0 10px 30px;
+    border: 5px solid #d7dce3;
+    padding: 10px 10px;
+    border-radius: 30px;
+    outline: none;
+}
+
+.new {
+    margin-top: 10px;
+    display: block;
+}
+
+.list-item {
+    text-align: center;
+    border-radius: 20px;
+    padding: 20px 10px 20px 10px;
+    margin: 30px 10px 10px 30px;
+    display: inline-block;
+    background: #d7dce3;
+    outline: none;
+    box-shadow:  8px 8px 13px #798ba2, 
+             -8px -8px 13px #a3bddc;
+}
+
+.list-item span {
+    cursor: pointer;
+}
+
+.new-project-form,
+.new-todo {
+    margin-top: 200px;
+    text-align: center;
+}
+
+.late {
+    border: 4px solid #bd3131;
+}
+
+.completed {
+    border: 4px solid #79cc49;
+}
+
+.check {
+    margin-left: 10px;
+    float: left;
+}
+
+.trash {
+    margin-right: 10px;
+    float: right;
+}
+
+.list-item hr {
+    position: relative;
+    bottom: 15px;
+}
+
+@media only screen and (max-width: 700px) {
+    main {
+        margin-left: 100px;
+    }
+
+    .sidebar {
+        width: 100px;
+    }
+
+    .project-names .material-icons {
+        display: inline;
+    }
+
+    .list-item {
+        text-align: center;
+        border-radius: none;
+        padding: 20px 10px 20px 10px;
+        margin: 10px 5px 5px 10px;
+        display: block;
+        background: #d7dce3;
+        outline: none;
+    }
+    .new {
+        margin: auto auto;
+    }
+
+    .list {
+        text-align: center;
+    }
+}
