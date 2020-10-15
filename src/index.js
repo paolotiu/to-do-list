@@ -1,19 +1,48 @@
 import { appendElements } from './helper.js'
 import { sidebar, getProjectFrom, showList } from './domhandler.js'
+import {
+    initFirebaseAuth,
+    isUserSignedIn,
+    saveProject,
+    loadProjects,
+    saveList,
+    deleteProjectFromDB,
+} from './firebaseAuth'
+const signInButton = document.querySelector('#sign-in')
 
 let allProjects = []
-if (localStorage.getItem('allProjects')){
-    allProjects = JSON.parse(localStorage.getItem('allProjects'))
-    
-}
-else{ 
-    localStorage.setItem('allProjects', JSON.stringify(allProjects))
-    allProjects = JSON.parse(localStorage.getItem('allProjects'))
-    
+let firebaseProjs = null
+
+initFirebaseAuth()
+async function start() {
+    if (isUserSignedIn()) {
+        console.log('signed in')
+        let x = await loadProjects()
+        allProjects = x
+    } else {
+        console.log('not signed in')
+
+        if (localStorage.getItem('allProjects')) {
+            allProjects = JSON.parse(localStorage.getItem('allProjects'))
+        } else {
+            localStorage.setItem('allProjects', JSON.stringify(allProjects))
+            allProjects = JSON.parse(localStorage.getItem('allProjects'))
+        }
+    }
+    makeExample()
+    newProjectForm()
+    addedProj()
 }
 
 class ToDoList {
-    constructor(title, description, dueDate, priority=1, notes = '',status=false) {
+    constructor(
+        title,
+        description,
+        dueDate,
+        priority = 1,
+        notes = '',
+        status = false
+    ) {
         this.status = status
         this.title = title
         this.description = description
@@ -28,42 +57,51 @@ class Project {
         this.name = name
         this.description = description
         this.lists = []
+        this.id = ID()
         allProjects.push(this)
-        localStorage.setItem('allProjects', JSON.stringify(allProjects))
+        if (!isUserSignedIn()) {
+            localStorage.setItem('allProjects', JSON.stringify(allProjects))
+        }
     }
-
-    
-    
 }
 
-function addList(project, list){
+function addList(project, list) {
     project.lists.push(list)
-    localStorage.setItem('allProjects', JSON.stringify(allProjects))
+
+    if (!isUserSignedIn()) {
+        localStorage.setItem('allProjects', JSON.stringify(allProjects))
+    } else {
+        saveList(project.id, project.lists)
+    }
 }
 
-function deleteList(project,list){
+function deleteList(project, list) {
     let index = project.lists.indexOf(list)
     project.lists.splice(index, 1)
-    localStorage.setItem('allProjects', JSON.stringify(allProjects))
+    if (!isUserSignedIn()) {
+        localStorage.setItem('allProjects', JSON.stringify(allProjects))
+    } else {
+        saveList(project.id, project.lists)
+    }
+    showList(project)
 }
 
-function deleteProject(project){
-    allProjects.splice(allProjects.indexOf(project), 1)
-    localStorage.setItem('allProjects', JSON.stringify(allProjects))
+function deleteProject(project) {
+    if (!isUserSignedIn()) {
+        allProjects.splice(allProjects.indexOf(project), 1)
+        localStorage.setItem('allProjects', JSON.stringify(allProjects))
+    } else {
+        deleteProjectFromDB(project.id)
+    }
+
     document.querySelector('#view').click()
     document.querySelector('#view').click()
     document.querySelector('.list').innerHTML = ''
 }
 
-function check(project){
-    if(allProjects.includes(project)){
-        return true
-    }
-    else{
-        return false
-    }
+function check(project) {
+    return true
 }
-
 
 function newProjectForm() {
     const newProject = document.querySelector('#new-project')
@@ -77,17 +115,21 @@ function newProjectForm() {
                 <br>
                 <input type="text" name="project-description" id="" placeholder="Project Description">
                 <br>
-                <input type="submit" name="submit-project" id="submit-project">
+                <input type="submit" id="submit-project" />
             </form>
         </div>
         `
 
-        let submit = document.getElementsByName('submit-project')[0]
+        let submit = document.getElementById('submit-project')
 
-        submit.addEventListener('click', () => {
+        submit.addEventListener('click', (e) => {
+            e.preventDefault()
             let data = getProjectFrom()
-            new Project(data.projectName, data.projectDescription)
-            
+            let project = new Project(data.projectName, data.projectDescription)
+            if (isUserSignedIn()) {
+                console.log('saving project to database')
+                saveProject(project, project.id)
+            }
             showList(allProjects[allProjects.length - 1])
             addedProj()
             document.querySelector('#view').click()
@@ -95,24 +137,62 @@ function newProjectForm() {
     })
 }
 
-
-newProjectForm()
-addedProj()
-
-if(!allProjects.length){
-    addList(new Project('Example Project', 'This is an example'), new ToDoList('Example List', "Example Description", "10-20-20", 3, 'Optional Notes', false))  
-    
-    localStorage.setItem('allProjects', JSON.stringify(allProjects))
-    document.querySelector('#view').click()
-    document.querySelector('.project-names').click()
+function makeExample() {
+    if (!allProjects.length) {
+        const project = new Project('Example Project', 'This is an example')
+        if (!isUserSignedIn()) {
+            localStorage.setItem('allProjects', JSON.stringify(allProjects))
+            addList(
+                project,
+                new ToDoList(
+                    'Example List',
+                    'Example Description',
+                    '10-20-20',
+                    3,
+                    'Optional Notes',
+                    false
+                )
+            )
+            document.querySelector('#view').click()
+            document.querySelector('.project-names').click()
+        } else {
+            saveProject(project, project.id).then((x) => {
+                addList(
+                    project,
+                    new ToDoList(
+                        'Example List',
+                        'Example Description',
+                        '10-20-20',
+                        3,
+                        'Optional Notes',
+                        false
+                    )
+                )
+                document.querySelector('#view').click()
+                document.querySelector('.project-names').click()
+            })
+        }
+    }
 }
-
 function addedProj() {
     sidebar(allProjects)
 
-    localStorage.setItem('allProjects', JSON.stringify(allProjects))
+    if (!isUserSignedIn()) {
+        localStorage.setItem('allProjects', JSON.stringify(allProjects))
+    }
 }
 
+start()
 
+var ID = function () {
+    // Math.random should be unique because of its seeding algorithm.
+    // Convert it to base 36 (numbers + letters), and grab the first 9 characters
+    // after the decimal.
+    return '_' + Math.random().toString(36).substr(2, 9)
+}
 
-export {ToDoList, addList, deleteList, deleteProject, check};
+function reset() {
+    let node = document.querySelector('#view').classList.remove('show')
+}
+
+export { ToDoList, addList, deleteList, deleteProject, check, start, reset }

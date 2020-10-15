@@ -1,5 +1,5 @@
 import { appendElements } from './helper.js'
-import {ToDoList, addList, deleteList, deleteProject, check} from './index.js'
+import { ToDoList, addList, deleteList, deleteProject, check } from './index.js'
 function sidebar(array = []) {
     const view = document.querySelector('#view')
     const projects = document.querySelector('#projects')
@@ -7,8 +7,9 @@ function sidebar(array = []) {
     let clicked = false
     view.addEventListener('click', () => {
         if (clicked) {
+            console.log(array)
             sort.innerText = 'arrow_right'
-            projects.innerHTML = ''
+            projects.classList.remove('show')
             clicked = false
         } else {
             sort.innerText = 'arrow_drop_down'
@@ -18,18 +19,21 @@ function sidebar(array = []) {
                 let del = document.createElement('span')
                 del.classList.add('material-icons')
                 del.innerText = 'delete_forever'
-                p.addEventListener('click', () => showList(x))
-                del.addEventListener('click', () => {
+                p.addEventListener('click', (e) => {
+                    console.log(e.target)
+                    showList(x)
+                })
+                del.addEventListener('click', (e) => {
+                    console.log(e.target)
                     deleteProject(x)
                 })
                 p.classList.add('project-names')
-                p.innerHTML = x.name 
-                
+                p.innerHTML = x.name
+
                 p.appendChild(del)
                 projects.appendChild(p)
-                
 
-                
+                projects.classList.add('show')
             })
             clicked = true
         }
@@ -37,9 +41,6 @@ function sidebar(array = []) {
 }
 
 function showList(project) {
-    if(!check(project)){
-        return
-    }
     let listConatiner = domElements.listConatiner
     //reset list shown
     domElements.listConatiner.innerHTML = ''
@@ -48,39 +49,34 @@ function showList(project) {
     let projectName = document.createElement('h1')
     projectName.innerText = project.name
     listConatiner.appendChild(projectName)
-    
 
     //Show all the lists
     project.lists.forEach((x) => {
         let currentDate = new Date()
-        
+
         let div = document.createElement('div')
         let date = document.createElement('p')
-        if(x.status){
+        if (x.status) {
             div.classList.add('list-item', 'completed')
-        }
-        else if(currentDate >= new Date(x.dueDate)){
+        } else if (currentDate >= new Date(x.dueDate)) {
             div.classList.add('list-item', 'late')
-        }
-        else{
+        } else {
             div.classList.add('list-item')
         }
         let title = document.createElement('h2')
         let description = document.createElement('p')
-        
-        let del= document.createElement('span')
+
+        let del = document.createElement('span')
         let completed = document.createElement('span')
         del.classList.add('material-icons', 'trash')
-        completed.classList.add('material-icons','check')
+        completed.classList.add('material-icons', 'check')
         del.innerText = 'close'
         completed.innerText = 'check'
 
         completed.addEventListener('click', () => {
-            
-            if(!x.status){
+            if (!x.status) {
                 x.status = true
-            }
-            else{
+            } else {
                 x.status = false
             }
             div.classList.toggle('completed')
@@ -100,7 +96,14 @@ function showList(project) {
         title.innerText = x.title
         date.innerText = x.dueDate
 
-        appendElements(div, [title, document.createElement('hr'), description, date, completed, del])
+        appendElements(div, [
+            title,
+            document.createElement('hr'),
+            description,
+            date,
+            completed,
+            del,
+        ])
         listConatiner.appendChild(div)
     })
 
@@ -119,12 +122,11 @@ function getProjectFrom() {
     return { projectName, projectDescription }
 }
 
-
-function newListForm(project){
+function newListForm(project) {
     domElements.listConatiner.innerHTML = `
     <div class="new-todo">
     <h2> New To Do </h2>
-    <form>
+    <form action="prevent()">
                 <input type="text" name="title" placeholder="List Name" required>
                 <br>
                 <input type="text" name="description" placeholder="List Description" required>
@@ -136,31 +138,31 @@ function newListForm(project){
     </div>
     `
     let submit = document.getElementsByName('submit-list')[0]
-    submit.addEventListener('click',() => makeNewList(
-        project,
-        document.getElementsByName('title')[0].value,
-        document.getElementsByName('description')[0].value,
-        document.getElementsByName('date')[0].value
-    ))
+    submit.addEventListener('click', (e) => {
+        e.preventDefault()
+        makeNewList(
+            project,
+            document.getElementsByName('title')[0].value,
+            document.getElementsByName('description')[0].value,
+            document.getElementsByName('date')[0].value
+        )
+    })
 }
 
-
-function makeNewList(project, title, description, date){
+function makeNewList(project, title, description, date) {
     addList(project, new ToDoList(title, description, date))
     showList(project)
 }
 
-function toggleComplete(list){
-    if(list.status){
+function toggleComplete(list) {
+    if (list.status) {
         return true
     }
 }
 
-
-
-const domElements = (function domElements(){
+const domElements = (function domElements() {
     const listConatiner = document.querySelector('.list')
 
-    return{listConatiner}
+    return { listConatiner }
 })()
-export { sidebar, showList, getProjectFrom}
+export { sidebar, showList, getProjectFrom }
