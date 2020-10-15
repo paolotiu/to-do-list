@@ -7,7 +7,7 @@ function sidebar(array = []) {
     let clicked = false
     view.addEventListener('click', () => {
         if (clicked) {
-            console.log(array)
+         =
             sort.innerText = 'arrow_right'
             projects.classList.remove('show')
             clicked = false
@@ -20,11 +20,11 @@ function sidebar(array = []) {
                 del.classList.add('material-icons')
                 del.innerText = 'delete_forever'
                 p.addEventListener('click', (e) => {
-                    console.log(e.target)
+                   
                     showList(x)
                 })
                 del.addEventListener('click', (e) => {
-                    console.log(e.target)
+                   
                     deleteProject(x)
                 })
                 p.classList.add('project-names')

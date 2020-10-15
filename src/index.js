@@ -12,16 +12,19 @@ const signInButton = document.querySelector('#sign-in')
 
 let allProjects = []
 let firebaseProjs = null
+function ID() {
+    // Math.random should be unique because of its seeding algorithm.
+    // Convert it to base 36 (numbers + letters), and grab the first 9 characters
+    // after the decimal.
+    return '_' + Math.random().toString(36).substr(2, 9)
+}
 
 initFirebaseAuth()
 async function start() {
     if (isUserSignedIn()) {
-        console.log('signed in')
         let x = await loadProjects()
         allProjects = x
     } else {
-        console.log('not signed in')
-
         if (localStorage.getItem('allProjects')) {
             allProjects = JSON.parse(localStorage.getItem('allProjects'))
         } else {
@@ -127,7 +130,6 @@ function newProjectForm() {
             let data = getProjectFrom()
             let project = new Project(data.projectName, data.projectDescription)
             if (isUserSignedIn()) {
-                console.log('saving project to database')
                 saveProject(project, project.id)
             }
             showList(allProjects[allProjects.length - 1])
@@ -183,13 +185,6 @@ function addedProj() {
 }
 
 start()
-
-var ID = function () {
-    // Math.random should be unique because of its seeding algorithm.
-    // Convert it to base 36 (numbers + letters), and grab the first 9 characters
-    // after the decimal.
-    return '_' + Math.random().toString(36).substr(2, 9)
-}
 
 function reset() {
     let node = document.querySelector('#view').classList.remove('show')
