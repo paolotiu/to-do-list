@@ -12,6 +12,9 @@
     </head>
     <body>
         <div class="sidebar">
+            <button id="sign-in" class="auth-button">Sign In</button>
+
+            <button id="sign-out" class="auth-button">Sign Out</button>
             <p class="side-link" id="new-project">New Project</p>
             <hr />
             <p class="side-link" id="view">
@@ -19,11 +22,47 @@
                 <span class="material-icons" id="a"> </span>
             </p>
             <p class="side-link" id="projects"></p>
+            <div class="side-link user-info">
+                <div class="user-image"></div>
+                <p class="user-name"></p>
+            </div>
         </div>
         <main>
             <div class="list"></div>
         </main>
 
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-app.js"></script>
+
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+        <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-analytics.js"></script>
+
+        <script>
+            // Your web app's Firebase configuration
+            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+            var firebaseConfig = {
+                apiKey: 'AIzaSyAZVMytuhOMCine3IzyqRm0pQNLMWbTUww',
+                authDomain: 'to-do-list-2a309.firebaseapp.com',
+                databaseURL: 'https://to-do-list-2a309.firebaseio.com',
+                projectId: 'to-do-list-2a309',
+                storageBucket: 'to-do-list-2a309.appspot.com',
+                messagingSenderId: '222282065724',
+                appId: '1:222282065724:web:c5b23f1d8b22cd31f8a039',
+                measurementId: 'G-96JDH41FNB',
+            }
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig)
+            firebase.analytics()
+        </script>
+        <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+
+        <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+        <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-analytics.js"></script>
+
+        <!-- Add Firebase products that you want to use -->
+        <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-firestore.js"></script>
         <script src="main.js"></script>
     </body>
 </html>
